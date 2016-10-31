@@ -1,11 +1,8 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 
 public class SpaceParticle : MonoBehaviour
 {
-    //private static readonly float GravitationalConstant = 6.67408f * Mathf.Pow(10, -11);
     private const float Scale = 0.1f;
 
     private static SceneManager sceneManager;
@@ -14,9 +11,6 @@ public class SpaceParticle : MonoBehaviour
 
     private void Start()
     {
-        //if(sceneManager == null)
-        //    sceneManager = transform.Find("SceneManager").GetComponent<SceneManager>();
-
         SceneManager.particles.Add(gameObject);
         rigidbody2D = gameObject.GetComponent<Rigidbody2D>();
     }

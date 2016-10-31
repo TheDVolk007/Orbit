@@ -1,9 +1,7 @@
 ﻿using System;
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using Random = UnityEngine.Random;
 
 public class SceneManager : MonoBehaviour
@@ -18,6 +16,14 @@ public class SceneManager : MonoBehaviour
     public static readonly float GravitationalConstant = 6.67408f * Mathf.Pow(10, -3);
 
     public static List<GameObject> particles = new List<GameObject>();
+
+    public enum Quadron
+    {
+        Fisrt,
+        Second,
+        Third,
+        Fourth
+    }
 
     private void Start ()
 	{
@@ -51,7 +57,9 @@ public class SceneManager : MonoBehaviour
         for (var i = 0; i < ParticlesToSpawn; i++)
         {
             var particle = InstantiateParticle(Random.insideUnitCircle * SpawnDistance);
-            AddSpinToParticle(particle, BalancedSystem ? (42f / SpawnDistance) :  SpinForce, true);
+            var rb2D = particle.GetComponent<Rigidbody2D>();
+
+            AddSpinToParticle(particle.transform.position, rb2D, BalancedSystem ? (42f / SpawnDistance) :  SpinForce, true);
         }
     }
 
@@ -60,13 +68,10 @@ public class SceneManager : MonoBehaviour
         return (GameObject)Instantiate(particlePrefab, particlePosition, Quaternion.identity);
     }
 
-    private void AddSpinToParticle(GameObject particle, float forceMagnitude, bool clockwise)
+    private static void AddSpinToParticle(Vector2 position, Rigidbody2D rb2D, float forceMagnitude, bool clockwise)
     {
-        var position = particle.transform.position;
-        var rb2D = particle.GetComponent<Rigidbody2D>();
-        var distanceToCenter = position.magnitude;
         var angleOfForce = CalculateAngle(position) + (clockwise ? (-90) : 90);
-        var forceVector = GetVectorFromMagnitudeAndAngle(forceMagnitude * distanceToCenter, angleOfForce);
+        var forceVector = GetVectorFromMagnitudeAndAngle(forceMagnitude * position.magnitude, angleOfForce);
         rb2D.AddForce(forceVector, ForceMode2D.Force);
     }
 
@@ -126,12 +131,4 @@ public class SceneManager : MonoBehaviour
     {
         return Mathf.Sqrt(GravitationalConstant * mass / orbitRadius);
     }
-}
-
-public enum Quadron
-{
-    Fisrt,
-    Second,
-    Third,
-    Fourth
 }
