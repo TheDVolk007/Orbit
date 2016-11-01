@@ -29,7 +29,7 @@ public class SpaceParticle : MonoBehaviour
 
     private void Attract()
     {
-        foreach(var other in SceneManager.particles.Where(p => p != gameObject && p != null))
+        foreach (var other in SceneManager.particles.Where(p => p != gameObject && p != null))
         {
             var rb2D = other.GetComponent<Rigidbody2D>();
             var vector = transform.position - other.transform.position;
@@ -44,7 +44,10 @@ public class SpaceParticle : MonoBehaviour
         if(rigidbody2D.mass < rb2D.mass)
             return;
 
-        rigidbody2D.mass += rb2D.mass;
+        var summMass = rigidbody2D.mass + rb2D.mass;
+        var proportion = rigidbody2D.mass / summMass;
+        rigidbody2D.velocity = rigidbody2D.velocity * proportion + rb2D.velocity * (1 - proportion); 
+        rigidbody2D.mass = summMass;
         Destroy(coll.gameObject);
     }
 }

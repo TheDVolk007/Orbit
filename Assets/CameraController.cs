@@ -4,10 +4,10 @@ public class CameraController : MonoBehaviour
 {
     public float Speed = 3f;
 
-    float cameraDistanceMax = 50f;
-    float cameraDistanceMin = 5f;
-    float cameraDistance = 10f;
-    float scrollSpeed = 5f;
+    public float CameraDistanceMax = 50f;
+    public float CameraDistanceMin = 3f;
+    public float CameraSize = 10f;
+    public float ScrollSpeed = 5f;
 
     void Start()
     {
@@ -17,9 +17,9 @@ public class CameraController : MonoBehaviour
     {
         var cameraComponent = transform.GetComponent<Camera>();
         
-        cameraDistance -= Input.GetAxis("Mouse ScrollWheel") * scrollSpeed;
-        cameraDistance = Mathf.Clamp(cameraDistance, cameraDistanceMin, cameraDistanceMax);
-        transform.position = new Vector3(transform.position.x, transform.position.y, -cameraDistance);
+        CameraSize -= Input.GetAxis("Mouse ScrollWheel") * ScrollSpeed;
+        CameraSize = Mathf.Clamp(CameraSize, CameraDistanceMin, CameraDistanceMax);
+        cameraComponent.orthographicSize = CameraSize;
 
         if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
         {

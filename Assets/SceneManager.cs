@@ -39,6 +39,32 @@ public class SceneManager : MonoBehaviour
             SpawnCirclingParticles();
     }
 
+    private void FixedUpdate()
+    {
+        //foreach(var other in SceneManager.particles.Where(p => p != gameObject && p != null))
+        //{
+        //    var rb2D = other.GetComponent<Rigidbody2D>();
+        //    var vector = transform.position - other.transform.position;
+        //    var force = SceneManager.GravitationalConstant * rigidbody2D.mass * rb2D.mass / vector.magnitude;
+        //    rb2D.AddForce(vector.normalized * force, ForceMode2D.Force);
+        //}
+
+        //for(var i = 0; i < particles.Count; i++)
+        //{
+        //    for(var j = i + 1; j < particles.Count; j++)
+        //    {
+        //        var first = particles[i];
+        //        var second = particles[j];
+        //        var rb2D1 = first.GetComponent<Rigidbody2D>();
+        //        var rb2D2 = second.GetComponent<Rigidbody2D>();
+        //        var vector = transform.position - second.transform.position;
+        //        var force = GravitationalConstant * rb2D1.mass * rb2D2.mass / vector.magnitude;
+        //        rb2D1.AddForce(-vector.normalized * force, ForceMode2D.Force);
+        //        rb2D2.AddForce(vector.normalized * force, ForceMode2D.Force);
+        //    }
+        //}
+    }
+
     private void LateUpdate()
     {
         particles = particles.Where(p => p != null).ToList();
@@ -59,7 +85,9 @@ public class SceneManager : MonoBehaviour
             var particle = InstantiateParticle(Random.insideUnitCircle * SpawnDistance);
             var rb2D = particle.GetComponent<Rigidbody2D>();
 
-            AddSpinToParticle(particle.transform.position, rb2D, BalancedSystem ? (42f / SpawnDistance) :  SpinForce, true);
+            rb2D.mass = Random.Range(1f, 3f);
+
+            AddSpinToParticle(particle.transform.position, rb2D, BalancedSystem ? (42f * 2.4f / SpawnDistance) :  SpinForce, true);
         }
     }
 
