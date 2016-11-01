@@ -66,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\CameraController.cs" />
+    <Compile Include="Assets\OrbitalMath.cs" />
     <Compile Include="Assets\SceneManager.cs" />
     <Compile Include="Assets\SpaceParticle.cs" />
   </ItemGroup>
