@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using Random = UnityEngine.Random;
 
@@ -33,7 +35,7 @@ public class SceneManager : MonoBehaviour
     private void FixedUpdate()
     {
         cachedParticlesData = cachedParticlesData.Where(p => p.GameObject != null).ToList();
-
+        
         for (var i = 0; i < cachedParticlesData.Count; i++)
         {
             for (var j = i + 1; j < cachedParticlesData.Count; j++)
@@ -41,7 +43,7 @@ public class SceneManager : MonoBehaviour
                 var first = cachedParticlesData[i];
                 var second = cachedParticlesData[j];
                 var vector = first.Transform.position - second.Transform.position;
-                var force = GravitationalConstant * first.Rigidbody2D.mass * second.Rigidbody2D.mass / vector.magnitude;
+                var force = GravitationalConstant * first.Rigidbody2D.mass * second.Rigidbody2D.mass / vector.sqrMagnitude;
                 first.Rigidbody2D.AddForce(-vector.normalized * force, ForceMode2D.Force);
                 second.Rigidbody2D.AddForce(vector.normalized * force, ForceMode2D.Force);
             }
@@ -65,7 +67,7 @@ public class SceneManager : MonoBehaviour
 
             rb2D.mass = Random.Range(1f, 3f);
 
-            AddSpinToParticle(particle.transform.position, rb2D, BalancedSystem ? (42f * 2.4f / SpawnDistance) :  SpinForce, true);
+            AddSpinToParticle(particle.transform.position, rb2D, BalancedSystem ? (42f / SpawnDistance) :  SpinForce, true);
         }
     }
 
