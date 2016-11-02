@@ -40,12 +40,10 @@ public class SceneManager : MonoBehaviour
         {
             for (var j = i + 1; j < cachedParticlesData.Count; j++)
             {
-                var first = cachedParticlesData[i];
-                var second = cachedParticlesData[j];
-                var vector = first.Transform.position - second.Transform.position;
-                var force = GravitationalConstant * first.Rigidbody2D.mass * second.Rigidbody2D.mass / vector.sqrMagnitude;
-                first.Rigidbody2D.AddForce(-vector.normalized * force, ForceMode2D.Force);
-                second.Rigidbody2D.AddForce(vector.normalized * force, ForceMode2D.Force);
+                var vector = cachedParticlesData[i].Transform.position - cachedParticlesData[j].Transform.position;
+                var force = GravitationalConstant * cachedParticlesData[i].Rigidbody2D.mass * cachedParticlesData[j].Rigidbody2D.mass / vector.sqrMagnitude;
+                cachedParticlesData[i].Rigidbody2D.AddForce(-vector.normalized * force, ForceMode2D.Force);
+                cachedParticlesData[j].Rigidbody2D.AddForce(vector.normalized * force, ForceMode2D.Force);
             }
         }
     }
