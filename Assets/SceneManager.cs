@@ -13,8 +13,8 @@ public class SceneManager : MonoBehaviour
     public bool BalancedSystem = true;
 
     public static readonly float GravitationalConstant = 6.67408f * Mathf.Pow(10, -3);
-
-    public static List<GameObject> particles = new List<GameObject>();
+    
+    public static List<SpaceParticleCachedData> cachedParticlesData = new List<SpaceParticleCachedData> ();
 
     private void Start ()
 	{
@@ -32,20 +32,18 @@ public class SceneManager : MonoBehaviour
 
     private void FixedUpdate()
     {
-        particles = particles.Where(p => p != null).ToList();
+        cachedParticlesData = cachedParticlesData.Where(p => p.GameObject != null).ToList();
 
-        for (var i = 0; i < particles.Count; i++)
+        for (var i = 0; i < cachedParticlesData.Count; i++)
         {
-            for (var j = i + 1; j < particles.Count; j++)
+            for (var j = i + 1; j < cachedParticlesData.Count; j++)
             {
-                var first = particles[i];
-                var second = particles[j];
-                var rb2D1 = first.GetComponent<Rigidbody2D>();
-                var rb2D2 = second.GetComponent<Rigidbody2D>();
-                var vector = transform.position - second.transform.position;
-                var force = GravitationalConstant * rb2D1.mass * rb2D2.mass / vector.magnitude;
-                rb2D1.AddForce(-vector.normalized * force, ForceMode2D.Force);
-                rb2D2.AddForce(vector.normalized * force, ForceMode2D.Force);
+                var first = cachedParticlesData[i];
+                var second = cachedParticlesData[j];
+                var vector = first.Transform.position - second.Transform.position;
+                var force = GravitationalConstant * first.Rigidbody2D.mass * second.Rigidbody2D.mass / vector.magnitude;
+                first.Rigidbody2D.AddForce(-vector.normalized * force, ForceMode2D.Force);
+                second.Rigidbody2D.AddForce(vector.normalized * force, ForceMode2D.Force);
             }
         }
     }

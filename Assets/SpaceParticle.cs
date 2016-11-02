@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using System.Linq;
 
 public class SpaceParticle : MonoBehaviour
@@ -11,8 +12,13 @@ public class SpaceParticle : MonoBehaviour
 
     private void Start()
     {
-        SceneManager.particles.Add(gameObject);
         rigidbody2D = gameObject.GetComponent<Rigidbody2D>();
+        SceneManager.cachedParticlesData.Add(new SpaceParticleCachedData
+        {
+            GameObject = gameObject,
+            Rigidbody2D = rigidbody2D,
+            Transform = transform
+        });
     }
 
     private void FixedUpdate()
