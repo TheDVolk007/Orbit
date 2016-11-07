@@ -21,6 +21,8 @@ public class CameraController : MonoBehaviour
         CameraSize = Mathf.Clamp(CameraSize, CameraDistanceMin, CameraDistanceMax);
         cameraComponent.orthographicSize = CameraSize;
 
+        Speed = CameraSize * 3f / 10f;
+
         if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
         {
             transform.Translate(new Vector3(Speed * Time.deltaTime, 0, 0));

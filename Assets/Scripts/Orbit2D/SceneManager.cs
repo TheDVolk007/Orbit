@@ -5,7 +5,7 @@ using Random = UnityEngine.Random;
 
 public class SceneManager : MonoBehaviour
 {
-    private static GameObject particlePrefab;
+    public static GameObject particlePrefab;
 
     public float ParticlesToSpawn = 10f;
     public float SpinForce = 10f;
