@@ -58,7 +58,7 @@ public class SceneManager : MonoBehaviour
         {
             var currentParticlesData = cachedParticlesData.Where(p => !p.Particle.isDestroyed).ToList();
 
-            const int maxCalculationsPerStep = 20000;
+            const int maxCalculationsPerStep = 35000;
             var breakPoints = MathHelper.FindBreakingPointsInArithmeticSequence(currentParticlesData.Count, -1, currentParticlesData.Count, maxCalculationsPerStep);
 
             for (var i = 0; i < currentParticlesData.Count; i++)
