@@ -7,4 +7,6 @@ public class SpaceParticleCachedData
     public Transform Transform { get; set; }
 
     public GameObject GameObject { get; set; }
+
+    public SpaceParticle Particle { get; set; }
 }

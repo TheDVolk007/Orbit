@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -13,9 +12,11 @@ public class SpaceParticle : MonoBehaviour
 
     private Rigidbody2D rigidbody2D;
 
-    public List<string> immuneToCollisionWithTags = new List<string>(); 
+    private readonly List<string> immuneToCollisionWithTags = new List<string>();
 
-    public string Tag = string.Empty;
+    private string Tag = string.Empty;
+
+    public bool isDestroyed;
 
     private void Start()
     {
@@ -24,18 +25,14 @@ public class SpaceParticle : MonoBehaviour
         {
             GameObject = gameObject,
             Rigidbody2D = rigidbody2D,
-            Transform = transform
+            Transform = transform,
+            Particle = this
         });
     }
 
     private void FixedUpdate()
     {
         CalculateRadius();
-
-        if(Input.GetKeyUp(KeyCode.F))
-        {
-            BlowUp(rigidbody2D.mass / 3f);
-        }
     }
     
     private void CalculateRadius()
@@ -47,7 +44,7 @@ public class SpaceParticle : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D coll)
     {
         var particle = coll.gameObject.GetComponent<SpaceParticle>();
-        if(particle == null || immuneToCollisionWithTags.Contains(particle.Tag))
+        if(isDestroyed || particle == null || particle.isDestroyed || immuneToCollisionWithTags.Contains(particle.Tag))
             return;
 
         var rb2D = coll.gameObject.GetComponent<Rigidbody2D>();
@@ -58,7 +55,10 @@ public class SpaceParticle : MonoBehaviour
         var proportion = rigidbody2D.mass / summMass;
         rigidbody2D.velocity = rigidbody2D.velocity * proportion + rb2D.velocity * (1 - proportion); 
         rigidbody2D.mass = summMass;
-        Destroy(coll.gameObject);
+        
+        particle.rigidbody2D.mass = float.Epsilon;
+        particle.CalculateRadius();
+        particle.isDestroyed = true;
     }
 
     public void BlowUp(float force)
