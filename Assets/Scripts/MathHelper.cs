@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Assets.Scripts
 {
@@ -35,6 +36,18 @@ namespace Assets.Scripts
             }
 
             return listOfPoints;
+        }
+
+        public static Vector2 TransportPointInRespectToPlaneBorders(Vector2 position, float borderRadius)
+        {
+            var pointsDistanceFromCenter = position.magnitude;
+            if(pointsDistanceFromCenter <= borderRadius)
+            {
+                return position;
+            }
+            var overlap = pointsDistanceFromCenter - borderRadius;
+            var lengthOfTransportedPosition = pointsDistanceFromCenter - 2 * overlap;
+            return -position.normalized * lengthOfTransportedPosition;
         }
     }
 }

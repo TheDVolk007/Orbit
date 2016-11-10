@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Assets.Scripts;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -33,12 +34,18 @@ public class SpaceParticle : MonoBehaviour
     private void FixedUpdate()
     {
         CalculateRadius();
+        CorrectPositioningInRespectToPlaneBorders();
     }
     
     private void CalculateRadius()
     {
         var radius = Mathf.Pow(rigidbody2D.mass, 1f/3f) * Scale;
         transform.localScale = new Vector2(radius, radius);
+    }
+
+    private void CorrectPositioningInRespectToPlaneBorders()
+    {
+        transform.position = MathHelper.TransportPointInRespectToPlaneBorders(transform.position, SceneManager.PlaneRadius);
     }
 
     private void OnCollisionEnter2D(Collision2D coll)

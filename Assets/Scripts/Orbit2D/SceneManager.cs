@@ -17,13 +17,17 @@ public class SceneManager : MonoBehaviour
 
     public static readonly float GravitationalConstant = 6.67408f * Mathf.Pow(10, -3);
     
-    public static List<SpaceParticleCachedData> cachedParticlesData = new List<SpaceParticleCachedData> ();
+    public static List<SpaceParticleCachedData> cachedParticlesData = new List<SpaceParticleCachedData>();
+
+    public static float PlaneRadius = 50f;
+    private GameObject plane;
 
     private bool isRunning;
 
     private void Start ()
 	{
 	    particlePrefab = Resources.Load<GameObject>("Prefabs/Particle");
+        plane = GameObject.Find("Plane");
 	}
 	
     private void Update ()
@@ -33,6 +37,8 @@ public class SceneManager : MonoBehaviour
 
         if(Input.GetMouseButtonUp(1))
             SpawnCirclingParticles();
+
+        plane.transform.localScale = new Vector3(PlaneRadius, PlaneRadius);
     }
 
     private void FixedUpdate()
@@ -68,10 +74,7 @@ public class SceneManager : MonoBehaviour
 
                 for (var j = i + 1; j < currentParticlesData.Count; j++)
                 {
-                    var vector = currentParticlesData[i].Transform.position - currentParticlesData[j].Transform.position;
-                    var force = GravitationalConstant * (1 + breakPoints.Count) * currentParticlesData[i].Rigidbody2D.mass * currentParticlesData[j].Rigidbody2D.mass / vector.sqrMagnitude;
-                    currentParticlesData[i].Rigidbody2D.AddForce(-vector.normalized * force, ForceMode2D.Force);
-                    currentParticlesData[j].Rigidbody2D.AddForce(vector.normalized * force, ForceMode2D.Force);
+                    AttractBodies(currentParticlesData[i], currentParticlesData[j], breakPoints.Count);
                 }
             }
 
@@ -81,7 +84,18 @@ public class SceneManager : MonoBehaviour
 
             yield return new WaitForFixedUpdate();
         }
-    } 
+    }
+
+    private static void AttractBodies(SpaceParticleCachedData firstBody, SpaceParticleCachedData secondBody, int forceMultiplyer)
+    {
+        //virtually make first point center of space, so the distance to the center for the second is the distance to the first (it's simoultaneously the negative of the new virtual position of second point)
+        var distanceToSecondParticle = firstBody.Transform.position - secondBody.Transform.position;
+        //make sure it has no overlap, and if it does, virtually transport the particle
+        distanceToSecondParticle = MathHelper.TransportPointInRespectToPlaneBorders(distanceToSecondParticle, PlaneRadius);
+        var force = GravitationalConstant * (1 + forceMultiplyer) * firstBody.Rigidbody2D.mass * secondBody.Rigidbody2D.mass / distanceToSecondParticle.sqrMagnitude;
+        firstBody.Rigidbody2D.AddForce(-distanceToSecondParticle.normalized * force, ForceMode2D.Force);
+        secondBody.Rigidbody2D.AddForce(distanceToSecondParticle.normalized * force, ForceMode2D.Force);
+    }
 
     private static void RunPreciseAttractionCalculation()
     {
