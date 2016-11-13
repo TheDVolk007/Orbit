@@ -30,6 +30,10 @@ namespace Assets.Scripts.Interface
             }
             textToDisplay = "FPS = " + Mathf.RoundToInt(fps);
             textToDisplay += "\r\nParticles: " + SceneManager.cachedParticlesData.Count;
+            //textToDisplay += "\r\nBiggest velocity: " + SceneManager.BiggestVelocitySoFar;
+            //textToDisplay += "\r\nBiggest velocity magnitude: " + SceneManager.BiggestVelocitySoFar.magnitude;
+            //textToDisplay += "\r\nBiggest velocity in this cycle: " + SceneManager.BiggestVelocityThisCycle;
+            //textToDisplay += "\r\nBiggest velocity in this cycle magnitude: " + SceneManager.BiggestVelocityThisCycle.magnitude;
 
             gameObject.GetComponent<GUIText>().text = textToDisplay;
             

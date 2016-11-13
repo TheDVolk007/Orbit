@@ -19,6 +19,9 @@ public class SceneManager : MonoBehaviour
     
     public static List<SpaceParticleCachedData> cachedParticlesData = new List<SpaceParticleCachedData>();
 
+    //public static Vector2 BiggestVelocitySoFar;
+    //public static Vector2 BiggestVelocityThisCycle;
+
     public static float PlaneRadius = 50f;
     private GameObject plane;
 
@@ -63,7 +66,7 @@ public class SceneManager : MonoBehaviour
         while(true)
         {
             var currentParticlesData = cachedParticlesData.Where(p => !p.Particle.isDestroyed).ToList();
-
+            //var biggestVelocityThisCycle = new Vector2();
             const int maxCalculationsPerStep = 20000;
             var breakPoints = MathHelper.FindBreakingPointsInArithmeticSequence(currentParticlesData.Count, -1, currentParticlesData.Count, maxCalculationsPerStep);
 
@@ -75,13 +78,23 @@ public class SceneManager : MonoBehaviour
                 for (var j = i + 1; j < currentParticlesData.Count; j++)
                 {
                     AttractBodies(currentParticlesData[i], currentParticlesData[j], breakPoints.Count);
+
+                    //if(currentParticlesData[i].Rigidbody2D.velocity.sqrMagnitude > BiggestVelocitySoFar.sqrMagnitude)
+                    //    BiggestVelocitySoFar = currentParticlesData[i].Rigidbody2D.velocity;
+                    //if (currentParticlesData[j].Rigidbody2D.velocity.sqrMagnitude > BiggestVelocitySoFar.sqrMagnitude)
+                    //    BiggestVelocitySoFar = currentParticlesData[j].Rigidbody2D.velocity;
+
+                    //if (currentParticlesData[i].Rigidbody2D.velocity.sqrMagnitude > biggestVelocityThisCycle.sqrMagnitude)
+                    //    biggestVelocityThisCycle = currentParticlesData[i].Rigidbody2D.velocity;
+                    //if (currentParticlesData[j].Rigidbody2D.velocity.sqrMagnitude > biggestVelocityThisCycle.sqrMagnitude)
+                    //    biggestVelocityThisCycle = currentParticlesData[j].Rigidbody2D.velocity;
                 }
             }
 
             var particlesToDestroy = cachedParticlesData.Where(p => p.Particle.isDestroyed).ToList();
             particlesToDestroy.ForEach(p => Destroy(p.GameObject));
             cachedParticlesData = cachedParticlesData.Where(p => p.GameObject != null).ToList();
-
+            //BiggestVelocityThisCycle = biggestVelocityThisCycle;
             yield return new WaitForFixedUpdate();
         }
     }
@@ -89,12 +102,20 @@ public class SceneManager : MonoBehaviour
     private static void AttractBodies(SpaceParticleCachedData firstBody, SpaceParticleCachedData secondBody, int forceMultiplyer)
     {
         //virtually make first point center of space, so the distance to the center for the second is the distance to the first (it's simoultaneously the negative of the new virtual position of second point)
-        var distanceToSecondParticle = firstBody.Transform.position - secondBody.Transform.position;
+        var vectorToSecondParticle = firstBody.Transform.position - secondBody.Transform.position;
         //make sure it has no overlap, and if it does, virtually transport the particle
-        distanceToSecondParticle = MathHelper.TransportPointInRespectToPlaneBorders(distanceToSecondParticle, PlaneRadius);
-        var force = GravitationalConstant * (1 + forceMultiplyer) * firstBody.Rigidbody2D.mass * secondBody.Rigidbody2D.mass / distanceToSecondParticle.sqrMagnitude;
-        firstBody.Rigidbody2D.AddForce(-distanceToSecondParticle.normalized * force, ForceMode2D.Force);
-        secondBody.Rigidbody2D.AddForce(distanceToSecondParticle.normalized * force, ForceMode2D.Force);
+        vectorToSecondParticle = MathHelper.TransportPointInRespectToPlaneBorders(vectorToSecondParticle, PlaneRadius);
+        var distanceSquared = vectorToSecondParticle.sqrMagnitude;
+        //if distance is less than sum of radiuses of bodies, it means they are on different sides of border of the plane, and distance must be the sum of radiuses
+        //for all cases, distance cannot be less than sum of radiuses
+        var sumOfRadiuses = (firstBody.Transform.localScale.x + secondBody.Transform.localScale.x) / 2;
+        var sumOfRadiusesSquared = sumOfRadiuses * sumOfRadiuses;
+        if(distanceSquared < sumOfRadiusesSquared)
+            distanceSquared = sumOfRadiusesSquared;
+
+        var force = GravitationalConstant * (1 + forceMultiplyer) * firstBody.Rigidbody2D.mass * secondBody.Rigidbody2D.mass / distanceSquared;
+        firstBody.Rigidbody2D.AddForce(-vectorToSecondParticle.normalized * force, ForceMode2D.Force);
+        secondBody.Rigidbody2D.AddForce(vectorToSecondParticle.normalized * force, ForceMode2D.Force);
     }
 
     private static void RunPreciseAttractionCalculation()
